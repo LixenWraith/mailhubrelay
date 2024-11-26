@@ -1,0 +1,4 @@
+-o freebsd
+-a amd64
+-s cmd/submitf/main.go
+-b bin/submitf

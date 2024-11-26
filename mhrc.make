@@ -1,0 +1,4 @@
+-o freebsd
+-a amd64
+-s cmd/mhrc/main.go
+-b bin/mhrc

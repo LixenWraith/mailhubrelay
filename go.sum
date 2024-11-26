@@ -1,0 +1,8 @@
+github.com/LixenWraith/logger v0.0.0-20241126035310-2276491ecb42 h1:Pxa7abTDSkmaRt+Fxn3nlqHohTYa7HgkdKalXZ7rzsk=
+github.com/LixenWraith/logger v0.0.0-20241126035310-2276491ecb42/go.mod h1:NKpMdmI1guDuBAdEQzupVywr5HycN7f9+Oq3paObfFA=
+github.com/LixenWraith/tinytoml v0.0.0-20241125164826-37e61dcbf33b h1:zjNL89uvvL9xB65qKXQGrzVOAH0CWkxRmcbU2uyyUk4=
+github.com/LixenWraith/tinytoml v0.0.0-20241125164826-37e61dcbf33b/go.mod h1:27w5bMp6NIrEuelM/8a+htswf0Dohs/AZ9tSsQ+lnN0=
+github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible h1:jdpOPRN1zP63Td1hDQbZW73xKmzDvZHzVdNYxhnTMDA=
+github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible/go.mod h1:1c7szIrayyPPB/987hsnvNzLushdWf4o/79s3P08L8A=
+github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
+github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
