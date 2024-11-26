@@ -53,14 +53,9 @@ Web service implementation for form submission processing:
 - Port 8845 (SubmitF form submission handling)
 - Appropriate firewall rules for specified ports
 
-## Installation Methodology
-
-### Standard Installation
-
-
 ## Build
 
-Cone or fork the repository.
+Clone or fork the repository.
 
 Use standard go build process, or use make.sh script to with pre-defined make config for freebsd/amd64 build:
 
@@ -71,8 +66,12 @@ Use standard go build process, or use make.sh script to with pre-defined make co
 ./script/make.sh -c submitf.make # Submit Form Handler
 ```
 
+## Installation
+
 ### Service Installation
+
 The installation/uninstallation scripts facilitate deployment.
+
 ```bash
 ./install-service.sh [-r] [-l] [-c] <path_to_executable>
 ./uninstall-service.sh [-l] [-c] <service_name>
@@ -102,7 +101,7 @@ Default configuration paths (not configurable):
 
 ## Implementation Guidelines
 
-### MHRC Sendmail Integration
+### MHRC FreeBSD Sendmail Integration
 
 1. Mailer Configuration Update:
 
@@ -133,6 +132,39 @@ ln -s /usr/local/bin/mhrc /usr/sbin/sendmail
 ```
 
 ## Operational Usage
+
+Suitable for small-medium servers with low email traffic.
+
+### Flows
+
+```
+                                                                 Gmail SMTP
+                                                                     |
+................................................. Internet ..................
+                |            ^            ^                          ^
+                v            v            |                          v
+................................................ [Firewall] .................
+                |            ^            ^                          ^
+                v            v            |                          |
+......................................................:SSL [NGINX]   |:TLS
+                |            ^            ^                          |
+                v            v            |                          v
+ [MHRC]     [SubmitF]   [Local Apps]  [Website]                    [MHRS]
+   |            |            |                                       ^
+   v            v            v                                       |
+   ------------------------------------------------------------------- 
+```
+
+Data Flow Patterns:
+
+A. Web Form Submission Path:
+Website form submission -> NGINX -> SubmitF -> MHRS -> Gmail SMTP
+
+B. Local Application Path:
+Local Apps -> MHRS -> Gmail SMTP
+
+C. Legacy Application Path:
+Sendmail Apps -> MHRC -> MHRS -> Gmail SMTP
 
 ### Server Operation (MHRS)
 
@@ -212,6 +244,16 @@ async function submitForm(event) {
     }
 }
 ```
+
+## Context & Background
+
+This project emerged from challenges in setting up mail servers in cloud environments. After experimenting with various solutions, several issues became apparent:
+
+- Port 25 is blocked by major cloud providers, forcing reliance on relay services
+- Traditional mail servers are complex to configure and tend to fallback to port 25
+- Existing lightweight alternatives lacked features, or had dependencies and complexities unsuitable for simple automated email needs
+
+MailHubRelay offers a streamlined solution by acting as an aggregator and mail agent for automated emails, relaying them through Gmail's SMTP service.
 
 ## License
 
