@@ -46,8 +46,6 @@ func main() {
 		}
 	}
 
-	fmt.Println(cfg)
-
 	if err := logger.Init(ctx, &cfg.Logging); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to initialize logger: %v\n", err)
 		os.Exit(1)

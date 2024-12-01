@@ -62,8 +62,6 @@ func main() {
 		os.Exit(EX_UNAVAILABLE)
 	}
 
-	fmt.Println(cfg)
-
 	switch {
 	case *bpFlag || *biFlag || *bhFlag || *bpurgFlag:
 		fmt.Println("Mail queue is empty")
