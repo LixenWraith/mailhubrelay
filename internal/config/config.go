@@ -64,11 +64,11 @@ var defaultConfig = Config{
 	},
 }
 
-func Load(name string) (*Config, error) {
+func Load(name string) (*Config, bool, error) {
 	defaultConfigPath := filepath.Join(defaultConfigBase, name, name+".toml")
 
 	if err := os.MkdirAll(filepath.Dir(defaultConfigPath), 0755); err != nil {
-		return nil, fmt.Errorf("failed to create config directory: %w", err)
+		return nil, false, fmt.Errorf("failed to create config directory: %w", err)
 	}
 
 	// Start with default config
@@ -77,43 +77,62 @@ func Load(name string) (*Config, error) {
 	config.Logging.Directory = filepath.Join(config.Logging.Directory, name)
 
 	// If config file exists, Load and merge with defaults
+	configExists := false
 	if _, err := os.Stat(defaultConfigPath); err == nil {
+		configExists = true
 		data, err := os.ReadFile(defaultConfigPath)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read config file: %w", err)
+			return nil, configExists, fmt.Errorf("failed to read config file: %w", err)
 		}
 
 		// Unmarshal into config, overwriting only specified values
 		if err := tinytoml.Unmarshal(data, &config); err != nil {
-			return nil, fmt.Errorf("failed to parse config file: %w", err)
+			return nil, configExists, fmt.Errorf("failed to parse config file: %w", err)
 		}
 	}
 
+	if err := validateConfig(&config); err != nil {
+		return nil, configExists, err
+	}
+
+	return &config, configExists, nil
+}
+
+func validateConfig(config *Config) error {
 	// Basic validation
 	if config.SMTP.Host == "" || config.SMTP.Port == "" ||
 		config.SMTP.FromAddr == "" || config.SMTP.AuthUser == "" ||
 		config.SMTP.AuthPass == "" {
-		return nil, fmt.Errorf("missing required SMTP configuration")
+		return fmt.Errorf("missing required SMTP configuration")
 	}
 
 	if config.Server.InternalAddr == "" || config.Server.Timeout <= 0 ||
 		config.Server.RetryDelay <= 0 || config.Server.MaxRetries <= 0 {
-		return nil, fmt.Errorf("invalid internal server configuration")
+		return fmt.Errorf("invalid internal server configuration")
 	}
 
 	if config.Logging.Directory == "" || config.Logging.BufferSize <= 0 {
-		return nil, fmt.Errorf("invalid logging configuration")
+		return fmt.Errorf("invalid logging configuration")
 	}
 
-	// Always write complete config back to ensure all defaults are saved
+	return nil
+}
+
+func Save(config *Config, name string) error {
+	if config == nil {
+		return fmt.Errorf("config cannot be nil")
+	}
+
+	defaultConfigPath := filepath.Join(defaultConfigBase, name, name+".toml")
+
 	data, err := tinytoml.Marshal(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal config: %w", err)
+		return fmt.Errorf("failed to marshal config: %w", err)
 	}
 
 	if err := os.WriteFile(defaultConfigPath, data, 0644); err != nil {
-		return nil, fmt.Errorf("failed to write config file: %w", err)
+		return fmt.Errorf("failed to write config file: %w", err)
 	}
 
-	return &config, nil
+	return nil
 }

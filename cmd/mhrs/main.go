@@ -35,10 +35,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cfg, err := config.Load(appName)
+	cfg, configExists, err := config.Load(appName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to load configuration: %v\n", err)
 		os.Exit(1)
+	}
+	if !configExists {
+		if config.Save(cfg, appName) != nil {
+			fmt.Fprintf(os.Stderr, "Failed to save configuration: %v\n", err)
+		}
 	}
 
 	fmt.Println(cfg)
@@ -105,9 +110,12 @@ func handleSignals(ctx context.Context, cancel context.CancelFunc, sigChan chan 
 // reloadConfig reloads the service configuration from disk and reinitializes the logger.
 // Returns an error if loading the new configuration or reinitializing the logger fails.
 func reloadConfig(ctx context.Context, cfg *config.Config) error {
-	newConfig, err := config.Load(appName)
+	newConfig, configExists, err := config.Load(appName)
 	if err != nil {
 		return fmt.Errorf("failed to load new configuration: %w", err)
+	}
+	if !configExists {
+		return fmt.Errorf("configuration file not found")
 	}
 
 	if err := logger.Init(ctx, &newConfig.Logging); err != nil {

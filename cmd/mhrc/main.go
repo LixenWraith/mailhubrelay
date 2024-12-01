@@ -56,7 +56,7 @@ func main() {
 
 	flag.Parse()
 
-	cfg, err := config.Load(appName)
+	cfg, _, err := config.Load(appName)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to load configuration: %v\n", err)
 		os.Exit(EX_UNAVAILABLE)

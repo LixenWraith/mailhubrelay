@@ -90,6 +90,7 @@ Deployment example:
 ./scripts/install-service.sh submitf # Form Handler
 ./scripts/install-app.sh mhrc        # Mail Hub Relay Client
 ```
+For running on a privileged port (<1024, e.g. 25), install as root (install-service -r).
 
 ### Configuration Management
 
