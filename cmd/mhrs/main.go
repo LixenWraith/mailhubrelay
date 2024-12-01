@@ -11,6 +11,7 @@ import (
 	"net/smtp"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -153,11 +154,15 @@ func handleConnection(ctx context.Context, conn net.Conn, cfg *config.Config) {
 	}
 
 	logger.Debug(ctx, "Successfully decoded email request", "recipient", req.Recipient, "subject_length", len(req.Subject))
+	var wg sync.WaitGroup
+	wg.Add(1)
 	emailCtx, cancel := context.WithTimeout(ctx, cfg.Server.Timeout)
 	go func() {
+		defer wg.Done()
+		defer cancel()
 		processEmail(emailCtx, req, cfg)
-		cancel() // Cancel only after processing is done
 	}()
+	wg.Wait()
 }
 
 // processEmail handles the email sending process with retries

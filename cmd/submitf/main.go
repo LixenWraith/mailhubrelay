@@ -72,7 +72,7 @@ func main() {
 	go func() {
 		<-sigChan
 		logger.Info(ctx, "Shutdown signal received")
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
 		logger.Info(shutdownCtx, "Shutdown signal received")
@@ -81,14 +81,9 @@ func main() {
 			logger.Error(shutdownCtx, "Server shutdown error", "error", err)
 		}
 
-		logShutdownCtx, logCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer logCancel()
-
-		if err := logger.Shutdown(logShutdownCtx); err != nil {
+		if err := logger.Shutdown(shutdownCtx); err != nil {
 			fmt.Fprintf(os.Stderr, "Logger shutdown error: %v\n", err)
 		}
-
-		cancel() // Cancel main context
 	}()
 
 	logger.Info(ctx, "Server started", "addr", server.Addr)
